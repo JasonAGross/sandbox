@@ -5,6 +5,7 @@
 		</FetchPlayer>
 		<ShowPlayer
 			v-bind:player="player"
+			v-bind:seasons="seasons"
 			v-on:doAddCompare="doAddPlayer">
 		</ShowPlayer>
 		<!--
@@ -24,6 +25,7 @@ export default {
 	name: 'app',
 	data: function() {
 		return {
+			seasons: {},
 			player: {},
 			activePlayerSet: []
 		}
@@ -35,12 +37,19 @@ export default {
 	},
 	methods: {
 		doFetchPlayer: function (playerAttr) {
-			var url = 'https://api.pubg.com/shards/' + playerAttr.region + '/players?filter[playerNames]=' + playerAttr.username
+			var url = 'https://api.pubg.com/shards/' + playerAttr.platform + '/players?filter[playerNames]=' + playerAttr.username
 			this.$http
 				.get(url, {headers: this.$apiHeaders})
 				.then(response => (this.player = response))
+				.then(this.doFetchSeasons(playerAttr.platform))
 		},
-		doAddPlayer: function(playerData) {
+		doFetchSeasons: function (platform) {
+			var url = 'https://api.pubg.com/shards/' + platform + '/seasons'
+			this.$http
+				.get(url, {headers: this.$apiHeaders})
+				.then(response => (this.seasons = response))
+		},
+		doAddPlayer: function (playerData) {
 			this.activePlayerSet.push(playerData)
 		}
 	}

@@ -4,8 +4,12 @@
     <div class="gg-fetchPlayer">
       <label for="setRegion">Choose Region</label>
       <select id="setRegion" v-model="playerAttr.region">
-        <option value="pc-na" selected>North America (NA)</option>
+        <option value="na" selected>North America (NA)</option>
       </select>
+      <label for="setRegion">Choose Platform</label>
+      <select id="setRegion" v-model="playerAttr.platform">
+        <option value="steam" selected>PC</option>
+      </select
       <label for="playerName">Username</label>
       <input type="text" id="playerName" name="playerName" v-model="playerAttr.username" />
       <button v-on:click="$emit('doFetchPlayer', playerAttr)">Search</button>
@@ -19,7 +23,8 @@ export default {
   data: function() {
     return {
       playerAttr: {
-        region: 'pc-na',
+        region: 'na',
+        platform: 'steam',
         username: ''
       }
     }
