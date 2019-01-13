@@ -1,5 +1,5 @@
 <template>
-	<div class="Player homeModule">
+	<div class="homeModule" v-if="playerStats.playerName">
 		<div class="filters">
 			<div class="filterGroup">
 				<button :class="{ active:isFpp }" @click="isFpp = true; getPlayerStats();">First Person</button>
@@ -11,28 +11,28 @@
 				<button :class="{ active:(teamMode == 'squad') }" @click="teamMode = 'squad'; getPlayerStats();">Squad</button>
 			</div>
 			<div class="filterGroup">
-				<select v-model="selectedSeason" @change="getPlayerStats()">
+				<select v-model="selectedSeason" @change="getProfile()">
 					<option value="lifetime">Lifetime</option>
-					<option v-for="season in seasonsDefined" :value="season.id">{{ season.title }}</option>
+					<option v-for="season in seasonsDefined" :key="season.id" :value="season.id">{{ season.title }}</option>
 				</select>
 			</div>
 		</div>
 		<div class="lifetimeStats">
-			<h2>{{ player.data.data[0].attributes.name }}</h2>
-			<h3>Lifetime Stats</h3>
+			<h2>{{ playerStats.playerName }}</h2>
+			<h3>{{ playerStatsTitle }}</h3>
 			<dl>
 				<dt>Games Played</dt>
-				<dd>{{ playerStats.roundsPlayed }}</dd>
+				<dd>{{ playerStats.data.roundsPlayed }}</dd>
 				<dt>Games Won</dt>
-				<dd>{{ playerStats.wins }}</dd>
+				<dd>{{ playerStats.data.wins }}</dd>
 				<dt>Top 10's</dt>
-				<dd>{{ playerStats.top10s }}</dd>
+				<dd>{{ playerStats.data.top10s }}</dd>
 				<dt>Kills</dt>
-				<dd>{{ playerStats.kills }}</dd>
+				<dd>{{ playerStats.data.kills }}</dd>
 			</dl>
 		</div>
 		<div class="actionPanel">
-			<button @click="$emit('doAddCompare', profile)">+ Compare</button>
+			<button @click="$emit('doAddCompare', playerStats)">+ Compare</button>
 		</div>
 	</div>
 </template>
@@ -53,7 +53,12 @@ export default {
 	data: function() {
 		return {
 			profile: {},
-			playerStats: {},
+			playerStats: {
+				id: null,
+				playerName: null,
+				title: null,
+				data: {}
+			},
 			isFpp: true,
 			teamMode: 'squad',
 			selectedSeason: 'lifetime',
@@ -62,15 +67,21 @@ export default {
 	},
 	computed: {
 		playerStatsTitle: function() {
-			return this.season
+			if (this.selectedSeason == 'lifetime') {
+				return 'Lifetime Stats'
+			} else {
+				for (var i = this.seasonsDefined.length - 1; i >= 0; i--) {
+					if (this.seasonsDefined[i].id == this.selectedSeason) {
+						return this.seasonsDefined[i].title + ' Stats'
+					}
+				}
+			}
+			return ''
 		}
 	},
 	watch: {
 		player: function() {
 			this.getProfile()
-		},
-		profile: function() {
-			this.getPlayerStats()
 		},
 		seasons: function() {
 			this.defineSeasons()
@@ -79,17 +90,22 @@ export default {
 	methods: {
 		getProfile: function() {
 			var playerID = this.player.data.data[0].id
-			var url = 'https://api.pubg.com/shards/steam/players/' + playerID + '/seasons/lifetime'
+			// Todo - add season, platform, region to application state
+			var url = 'https://api.pubg.com/shards/steam/players/' + playerID + '/seasons/' + this.selectedSeason
 			this.$http
 				.get(url, {headers: this.$apiHeaders})
 				.then(response => (this.profile = response))
+				.then(this.getPlayerStats)
 		},
 		getPlayerStats: function() {
 			var gameMode = this.teamMode
 			if (this.isFpp) {
 				gameMode = gameMode + '-fpp'
 			}
-			this.playerStats = this.profile.data.data.attributes.gameModeStats[gameMode]
+			this.playerStats.id = this.profile.data.data.relationships.player.data.id + this.selectedSeason
+			this.playerStats.playerName = this.player.data.data[0].attributes.name
+			this.playerStats.title = this.playerStatsTitle
+			this.playerStats.data = this.profile.data.data.attributes.gameModeStats[gameMode]
 		},
 		defineSeasons: function() {
 			var seasonsDefinedTemp = []

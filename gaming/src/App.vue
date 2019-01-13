@@ -4,22 +4,20 @@
 			v-on:doFetchPlayer="doFetchPlayer">
 		</FetchPlayer>
 		<ShowPlayer
-			v-bind:player="player"
-			v-bind:seasons="seasons"
+			:player="player"
+			:seasons="seasons"
 			v-on:doAddCompare="doAddPlayer">
 		</ShowPlayer>
-		<!--
-		<ShowMatches
-			v-bind:player="player">
-		</ShowMatches>
-		-->
+		<Compare
+			:activePlayers="activePlayerSet">		
+		</Compare>
 	</div>
 </template>
 
 <script>
 import FetchPlayer from './components/FetchPlayer.vue'
 import ShowPlayer from './components/ShowPlayer.vue'
-import ShowMatches from './components/ShowMatches.vue'
+import Compare from './components/Compare.vue'
 
 export default {
 	name: 'app',
@@ -33,7 +31,7 @@ export default {
 	components: {
 		FetchPlayer,
 		ShowPlayer,
-		ShowMatches
+		Compare
 	},
 	methods: {
 		doFetchPlayer: function (playerAttr) {

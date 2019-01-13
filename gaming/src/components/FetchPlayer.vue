@@ -1,5 +1,5 @@
 <template>
-  <div class="lookup">
+  <div class="homeModule">
     <h1>Search for a player</h1>
     <div class="gg-fetchPlayer">
       <label for="setRegion">Choose Region</label>
@@ -9,7 +9,7 @@
       <label for="setRegion">Choose Platform</label>
       <select id="setRegion" v-model="playerAttr.platform">
         <option value="steam" selected>PC</option>
-      </select
+      </select>
       <label for="playerName">Username</label>
       <input type="text" id="playerName" name="playerName" v-model="playerAttr.username" />
       <button v-on:click="$emit('doFetchPlayer', playerAttr)">Search</button>
