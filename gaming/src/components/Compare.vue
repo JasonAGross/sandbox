@@ -1,16 +1,16 @@
 <template>
-	<div class="homeModule">
+	<div class="homeModule" v-if="activePlayers.length > 0">
 		<table class="compareTable">
 			<thead>
 				<tr>
 					<td class="empty"></td>
-					<th v-for="player in activePlayers">{{ player.playerName }}</th>
+					<th v-for="player in activePlayers" :key="player.id">{{ player.playerName }}</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="filter in activeDataFilters">
+				<tr v-for="filter in activeDataFilters" :key="filter.id">
 					<td class="rowLabel">{{ filter.title }}</td>
-					<td v-for="player in activePlayers">{{ player.data[filter.id] }}</td>
+					<td v-for="player in activePlayers" :key="player.id">{{ player.data[filter.id] }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -21,12 +21,9 @@
 export default {
 	name: 'compare',
 	props: {
-		activePlayers: {
-			type: Array,
-			required: true
-		}
+		
 	},
-	data: function() {
+	data () {
 		return {
 			filters: {
 				dataPoints: [
@@ -190,7 +187,10 @@ export default {
 		}
 	},
 	computed: {
-		activeDataFilters: function() {
+		activePlayers () {
+			return this.$store.state.activePlayers
+		},
+		activeDataFilters () {
 			var activeFilters = []
 			for (var i = this.filters.dataPoints.length - 1; i >= 0; i--) {
 				if (this.filters.dataPoints[i].active) {

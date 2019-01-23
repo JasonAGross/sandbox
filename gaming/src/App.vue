@@ -5,12 +5,9 @@
 		</FetchPlayer>
 		<ShowPlayer
 			:player="player"
-			:seasons="seasons"
-			v-on:doAddCompare="doAddPlayer">
+			:seasons="seasons">
 		</ShowPlayer>
-		<Compare
-			:activePlayers="activePlayerSet">		
-		</Compare>
+		<Compare></Compare>
 	</div>
 </template>
 
@@ -21,11 +18,10 @@ import Compare from './components/Compare.vue'
 
 export default {
 	name: 'app',
-	data: function() {
+	data () {
 		return {
 			seasons: {},
-			player: {},
-			activePlayerSet: []
+			player: {}
 		}
 	},
 	components: {
@@ -34,21 +30,18 @@ export default {
 		Compare
 	},
 	methods: {
-		doFetchPlayer: function (playerAttr) {
+		doFetchPlayer (playerAttr) {
 			var url = 'https://api.pubg.com/shards/' + playerAttr.platform + '/players?filter[playerNames]=' + playerAttr.username
 			this.$http
 				.get(url, {headers: this.$apiHeaders})
 				.then(response => (this.player = response))
 				.then(this.doFetchSeasons(playerAttr.platform))
 		},
-		doFetchSeasons: function (platform) {
+		doFetchSeasons (platform) {
 			var url = 'https://api.pubg.com/shards/' + platform + '/seasons'
 			this.$http
 				.get(url, {headers: this.$apiHeaders})
 				.then(response => (this.seasons = response))
-		},
-		doAddPlayer: function (playerData) {
-			this.activePlayerSet.push(playerData)
 		}
 	}
 }

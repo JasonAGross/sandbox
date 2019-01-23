@@ -20,7 +20,7 @@
 <script>
 export default {
   name: 'FetchPlayer',
-  data: function() {
+  data () {
     return {
       playerAttr: {
         region: 'na',

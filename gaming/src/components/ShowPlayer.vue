@@ -32,7 +32,10 @@
 			</dl>
 		</div>
 		<div class="actionPanel">
-			<button @click="$emit('doAddCompare', playerStats)">+ Compare</button>
+			<button @click="addPlayer()">+ Compare</button>
+			<p v-if="error == 'playerExists'">
+				This player and season is already being compared.
+			</p>
 		</div>
 	</div>
 </template>
@@ -50,7 +53,7 @@ export default {
 			type: Object
 		}
 	},
-	data: function() {
+	data () {
 		return {
 			profile: {},
 			playerStats: {
@@ -62,11 +65,12 @@ export default {
 			isFpp: true,
 			teamMode: 'squad',
 			selectedSeason: 'lifetime',
-			seasonsDefined: []
+			seasonsDefined: [],
+			error: ''
 		}
 	},
 	computed: {
-		playerStatsTitle: function() {
+		playerStatsTitle () {
 			if (this.selectedSeason == 'lifetime') {
 				return 'Lifetime Stats'
 			} else {
@@ -80,15 +84,15 @@ export default {
 		}
 	},
 	watch: {
-		player: function() {
+		player () {
 			this.getProfile()
 		},
-		seasons: function() {
+		seasons () {
 			this.defineSeasons()
 		}
 	},
 	methods: {
-		getProfile: function() {
+		getProfile () {
 			var playerID = this.player.data.data[0].id
 			// Todo - add season, platform, region to application state
 			var url = 'https://api.pubg.com/shards/steam/players/' + playerID + '/seasons/' + this.selectedSeason
@@ -97,7 +101,7 @@ export default {
 				.then(response => (this.profile = response))
 				.then(this.getPlayerStats)
 		},
-		getPlayerStats: function() {
+		getPlayerStats () {
 			var gameMode = this.teamMode
 			if (this.isFpp) {
 				gameMode = gameMode + '-fpp'
@@ -107,7 +111,7 @@ export default {
 			this.playerStats.title = this.playerStatsTitle
 			this.playerStats.data = this.profile.data.data.attributes.gameModeStats[gameMode]
 		},
-		defineSeasons: function() {
+		defineSeasons () {
 			var seasonsDefinedTemp = []
 			for (var i = this.seasons.data.data.length - 1; i >= 0; i--) {
 				var redefinedSeason = {}
@@ -131,6 +135,13 @@ export default {
 				seasonsDefinedTemp.push(redefinedSeason)
 			}
 			this.seasonsDefined = seasonsDefinedTemp
+		},
+		addPlayer () {
+			this.$store.dispatch('addPlayer', this.playerStats).then(response => {
+				console.log('added')
+			}, error => {
+				this.error = 'playerExists'
+			})
 		}
 	}
 }
