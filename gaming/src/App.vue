@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import FetchPlayer from './components/FetchPlayer.vue'
 import ShowPlayer from './components/ShowPlayer.vue'
 import Compare from './components/Compare.vue'
@@ -31,16 +32,14 @@ export default {
 	},
 	methods: {
 		doFetchPlayer (playerAttr) {
-			var url = 'https://api.pubg.com/shards/' + playerAttr.platform + '/players?filter[playerNames]=' + playerAttr.username
-			this.$http
-				.get(url, {headers: this.$apiHeaders})
+			var url = '/shards/' + playerAttr.platform + '/players?filter[playerNames]=' + playerAttr.username
+			axios.get(url)
 				.then(response => (this.player = response))
 				.then(this.doFetchSeasons(playerAttr.platform))
 		},
 		doFetchSeasons (platform) {
-			var url = 'https://api.pubg.com/shards/' + platform + '/seasons'
-			this.$http
-				.get(url, {headers: this.$apiHeaders})
+			var url = '/shards/' + platform + '/seasons'
+			axios.get(url)
 				.then(response => (this.seasons = response))
 		}
 	}

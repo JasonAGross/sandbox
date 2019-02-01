@@ -42,7 +42,10 @@
 
 <script>
 
+import axios from 'axios'
+
 export default {
+
 	name: 'ShowPlayer',
 	props: {
 		player: {
@@ -95,9 +98,8 @@ export default {
 		getProfile () {
 			var playerID = this.player.data.data[0].id
 			// Todo - add season, platform, region to application state
-			var url = 'https://api.pubg.com/shards/steam/players/' + playerID + '/seasons/' + this.selectedSeason
-			this.$http
-				.get(url, {headers: this.$apiHeaders})
+			var url = '/shards/steam/players/' + playerID + '/seasons/' + this.selectedSeason
+			axios.get(url)
 				.then(response => (this.profile = response))
 				.then(this.getPlayerStats)
 		},
